@@ -1,0 +1,19 @@
+###generate #1
+POST http://localhost:8080/links
+Content-Type: application/json
+
+{
+  "original": "https://www.noob-club.ru/index.php?frontpage;p=45"
+}
+
+###generate #2
+POST http://localhost:8080/links
+Content-Type: application/json
+
+{
+  "original": "https://catalog.onliner.by/notebook?page=2"
+}
+
+###redirect
+GET http://localhost:8080/links/?shortLink=/2/onliner
+Accept: application/json
