@@ -1,5 +1,6 @@
 package by.grigoryev.linkshortener.service.impl;
 
+import by.grigoryev.linkshortener.exception.LinkDoesNotExistException;
 import by.grigoryev.linkshortener.model.OriginalLink;
 import by.grigoryev.linkshortener.model.ShortLink;
 import by.grigoryev.linkshortener.repository.OriginalLinkRepository;
@@ -43,9 +44,10 @@ public class LinkServiceImpl implements LinkService {
     @Override
     public OriginalLink redirect(String link) {
         ShortLink shortLink = shortLinkRepository.findFirstByLinkOrderByIdDesc(link)
-                .orElseThrow(() -> new RuntimeException("No link"));
+                .orElseThrow(() -> new LinkDoesNotExistException("This link " + link + " does not exist!"));
         OriginalLink originalLink = originalLinkRepository.findById(shortLink.getOriginalId())
-                .orElseThrow(() -> new RuntimeException("No ID"));
+                .orElseThrow(() -> new LinkDoesNotExistException("Original link with id " + shortLink.getOriginalId() +
+                                                                 " does not exist!"));
         log.info("redirect {}", originalLink);
         return originalLink;
     }
