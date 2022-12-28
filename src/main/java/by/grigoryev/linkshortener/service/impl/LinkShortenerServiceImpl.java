@@ -1,17 +1,14 @@
 package by.grigoryev.linkshortener.service.impl;
 
 import by.grigoryev.linkshortener.dto.LinkStatistic;
-import by.grigoryev.linkshortener.exception.LinkDoesNotExistException;
 import by.grigoryev.linkshortener.model.OriginalLink;
 import by.grigoryev.linkshortener.model.ShortLink;
-import by.grigoryev.linkshortener.repository.OriginalLinkRepository;
-import by.grigoryev.linkshortener.repository.ShortLinkRepository;
+import by.grigoryev.linkshortener.service.LinkCrudService;
 import by.grigoryev.linkshortener.service.LinkShortenerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -19,13 +16,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LinkShortenerServiceImpl implements LinkShortenerService {
 
-    private final OriginalLinkRepository originalLinkRepository;
-
-    private final ShortLinkRepository shortLinkRepository;
+    private final LinkCrudService linkCrudService;
 
     @Override
     public ShortLink generate(OriginalLink originalLink) {
-        OriginalLink savedLink = save(originalLink);
+        OriginalLink savedLink = linkCrudService.save(originalLink);
 
         String[] splitTwoSlash = savedLink.getOriginal().split("//");
         int indexOfUrl = splitTwoSlash[1].indexOf("/");
@@ -41,7 +36,7 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
         }
 
         ShortLink shortLink = createShortLink(String.valueOf(result), savedLink.getId());
-        save(shortLink);
+        linkCrudService.save(shortLink);
 
         log.info("generate {}", shortLink);
         return shortLink;
@@ -49,25 +44,22 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
 
     @Override
     public OriginalLink redirect(String link) {
-        ShortLink shortLink = findFirstByLinkOrderByIdDesc(link);
-        updateCount(shortLink);
-        OriginalLink originalLink = findById(shortLink);
+        ShortLink shortLink = linkCrudService.findFirstByLinkOrderByIdDesc(link);
+        linkCrudService.updateCount(shortLink);
+        OriginalLink originalLink = linkCrudService.findById(shortLink);
         log.info("redirect {}", originalLink);
         return originalLink;
     }
 
     @Override
     public LinkStatistic stats(String link) {
-        ShortLink shortLink = findFirstByLinkOrderByIdDesc(link);
-        OriginalLink originalLink = findById(shortLink);
+        ShortLink shortLink = linkCrudService.findFirstByLinkOrderByIdDesc(link);
+        OriginalLink originalLink = linkCrudService.findById(shortLink);
 
-        List<ShortLink> shortLinks = shortLinkRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(ShortLink::getCount).reversed())
-                .toList();
+        List<ShortLink> shortLinks = linkCrudService.findAllSortedByCountDesc();
 
         long rank = 0;
-        for(int i = 0; i < shortLinks.size(); i++) {
+        for (int i = 0; i < shortLinks.size(); i++) {
             if (shortLink.equals(shortLinks.get(i))) {
                 rank = i + 1L;
             }
@@ -77,39 +69,6 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
 
         log.info("stats {}", linkStatistic);
         return linkStatistic;
-    }
-
-    @Override
-    public OriginalLink save(OriginalLink originalLink) {
-        OriginalLink link = originalLinkRepository.save(originalLink);
-        log.info("save original {}", link);
-        return link;
-    }
-
-    @Override
-    public void save(ShortLink shortLink) {
-        ShortLink link = shortLinkRepository.save(shortLink);
-        log.info("save link {}", link);
-    }
-
-    @Override
-    public void updateCount(ShortLink link) {
-        link.setCount(link.getCount() + 1);
-        ShortLink updatedLink = shortLinkRepository.save(link);
-        log.info("updateCount {}", updatedLink);
-    }
-
-    @Override
-    public ShortLink findFirstByLinkOrderByIdDesc(String link) {
-        return shortLinkRepository.findFirstByLinkOrderByIdDesc(link)
-                .orElseThrow(() -> new LinkDoesNotExistException("This link " + link + " does not exist!"));
-    }
-
-    @Override
-    public OriginalLink findById(ShortLink shortLink) {
-        return originalLinkRepository.findById(shortLink.getOriginalId())
-                .orElseThrow(() -> new LinkDoesNotExistException("Original link with id " + shortLink.getOriginalId() +
-                                                                 " does not exist!"));
     }
 
     private static ShortLink createShortLink(String result, Long id) {

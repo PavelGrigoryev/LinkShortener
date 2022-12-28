@@ -12,14 +12,4 @@ public interface LinkShortenerService {
 
     LinkStatistic stats(String link);
 
-    OriginalLink save(OriginalLink originalLink);
-
-    void save(ShortLink shortLink);
-
-    void updateCount(ShortLink link);
-
-    ShortLink findFirstByLinkOrderByIdDesc(String link);
-
-    OriginalLink findById(ShortLink shortLink);
-
 }
