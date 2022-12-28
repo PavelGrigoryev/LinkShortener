@@ -27,4 +27,7 @@ public class ShortLink {
     @Column(name = "original_id")
     private Long originalId;
 
+    @JsonIgnore
+    private Long count;
+
 }

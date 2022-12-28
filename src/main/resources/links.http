@@ -1,5 +1,5 @@
 ###generate #1
-POST http://localhost:8080/links
+POST http://localhost:8080/generate
 Content-Type: application/json
 
 {
@@ -7,13 +7,25 @@ Content-Type: application/json
 }
 
 ###generate #2
-POST http://localhost:8080/links
+POST http://localhost:8080/generate
 Content-Type: application/json
 
 {
   "original": "https://catalog.onliner.by/notebook?page=2"
 }
 
+###generate #3
+POST http://localhost:8080/generate
+Content-Type: application/json
+
+{
+  "original": "https://habr.com/ru/news/t/708070/"
+}
+
 ###redirect
-GET http://localhost:8080/links/?shortLink=/2/onliner
+GET http://localhost:8080/?shortLink=/2/onliner
+Accept: application/json
+
+###stats
+GET http://localhost:8080/stats/?shortLink=/2/onliner
 Accept: application/json
