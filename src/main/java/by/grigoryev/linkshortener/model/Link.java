@@ -1,6 +1,5 @@
 package by.grigoryev.linkshortener.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,14 +12,21 @@ import javax.persistence.*;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "original_links")
-public class OriginalLink {
+@Table(name = "links")
+public class Link {
 
     @Id
-    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String original;
+    @Column(name = "original")
+    private String originalLink;
+
+    @Column(name = "link")
+    private String shortLink;
+
+    private Integer count;
+
+    private Integer rank;
 
 }

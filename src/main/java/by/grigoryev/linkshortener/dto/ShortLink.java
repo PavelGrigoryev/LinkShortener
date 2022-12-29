@@ -5,14 +5,8 @@ import lombok.Data;
 
 @Data
 @Builder
-public class LinkStatistic {
+public class ShortLink {
 
     private String link;
-
-    private String original;
-
-    private Integer rank;
-
-    private Integer count;
 
 }

@@ -1,10 +1,8 @@
 package by.grigoryev.linkshortener.service.impl;
 
 import by.grigoryev.linkshortener.exception.LinkDoesNotExistException;
-import by.grigoryev.linkshortener.model.OriginalLink;
-import by.grigoryev.linkshortener.model.ShortLink;
-import by.grigoryev.linkshortener.repository.OriginalLinkRepository;
-import by.grigoryev.linkshortener.repository.ShortLinkRepository;
+import by.grigoryev.linkshortener.model.Link;
+import by.grigoryev.linkshortener.repository.LinkRepository;
 import by.grigoryev.linkshortener.service.LinkCrudService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,55 +16,63 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LinkCrudServiceImpl implements LinkCrudService {
 
-    private final OriginalLinkRepository originalLinkRepository;
-
-    private final ShortLinkRepository shortLinkRepository;
+    private final LinkRepository linkRepository;
 
     @Override
-    public OriginalLink save(OriginalLink originalLink) {
-        OriginalLink link = originalLinkRepository.save(originalLink);
-        log.info("save original {}", link);
+    public Link save(String originalLink) {
+        Link link = createLink(originalLink);
+        log.info("save {}", link);
         return link;
     }
 
     @Override
-    public void save(ShortLink shortLink) {
-        ShortLink link = shortLinkRepository.save(shortLink);
-        log.info("save link {}", link);
+    public Link updateShortLink(Link link, String shortLink) {
+        link.setShortLink(shortLink);
+        Link updatedLink = linkRepository.save(link);
+        log.info("updateShortLink {}", updatedLink);
+        return updatedLink;
     }
 
     @Override
-    public void updateCount(ShortLink link) {
+    public Link findFirstByShortLinkOrderByIdDesc(String shortLink) {
+        Link link = linkRepository.findFirstByShortLinkOrderByIdDesc(shortLink)
+                .orElseThrow(() -> new LinkDoesNotExistException("This link " + shortLink + " does not exist!"));
+        log.info("findFirstByShortLinkOrderByIdDesc {}", link);
+        return link;
+    }
+
+    @Override
+    public Link updateCount(Link link) {
         link.setCount(link.getCount() + 1);
-        ShortLink updatedLink = shortLinkRepository.save(link);
+        Link updatedLink = linkRepository.save(link);
         log.info("updateCount {}", updatedLink);
+        return updatedLink;
     }
 
     @Override
-    public ShortLink findFirstByLinkOrderByIdDesc(String link) {
-        ShortLink shortLink = shortLinkRepository.findFirstByLinkOrderByIdDesc(link)
-                .orElseThrow(() -> new LinkDoesNotExistException("This link " + link + " does not exist!"));
-        log.info("findFirstByLinkOrderByIdDesc {}", shortLink);
-        return shortLink;
-    }
-
-    @Override
-    public OriginalLink findById(Long originalId) {
-        OriginalLink originalLink = originalLinkRepository.findById(originalId)
-                .orElseThrow(() -> new LinkDoesNotExistException("Original link with id " + originalId +
-                                                                 " does not exist!"));
-        log.info("findById {}", originalLink);
-        return originalLink;
-    }
-
-    @Override
-    public List<ShortLink> findAllSortedByCountDesc() {
-        List<ShortLink> shortLinks = shortLinkRepository.findAll()
+    public List<Link> findAllSortedByCountDesc() {
+        List<Link> shortLinks = linkRepository.findAll()
                 .stream()
-                .sorted(Comparator.comparing(ShortLink::getCount).reversed())
+                .sorted(Comparator.comparing(Link::getCount).reversed())
                 .toList();
         log.info("findAllSortedByCountDesc {}", shortLinks);
         return shortLinks;
+    }
+
+    @Override
+    public Link updateRank(Link link, Integer rank) {
+        link.setRank(rank);
+        Link updatedLink = linkRepository.save(link);
+        log.info("updateRank {}", updatedLink);
+        return updatedLink;
+    }
+
+    private Link createLink(String originalLink) {
+        return linkRepository.save(Link.builder()
+                .originalLink(originalLink)
+                .count(0)
+                .rank(0)
+                .build());
     }
 
 }

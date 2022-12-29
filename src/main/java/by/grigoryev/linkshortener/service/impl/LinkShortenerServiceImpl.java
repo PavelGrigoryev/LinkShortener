@@ -1,8 +1,9 @@
 package by.grigoryev.linkshortener.service.impl;
 
 import by.grigoryev.linkshortener.dto.LinkStatistic;
-import by.grigoryev.linkshortener.model.OriginalLink;
-import by.grigoryev.linkshortener.model.ShortLink;
+import by.grigoryev.linkshortener.dto.OriginalLink;
+import by.grigoryev.linkshortener.dto.ShortLink;
+import by.grigoryev.linkshortener.model.Link;
 import by.grigoryev.linkshortener.service.LinkCrudService;
 import by.grigoryev.linkshortener.service.LinkShortenerService;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Service
@@ -22,14 +22,14 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
 
     @Override
     public ShortLink generate(OriginalLink originalLink) {
-        OriginalLink savedLink = linkCrudService.save(originalLink);
+        Link link = linkCrudService.save(originalLink.getOriginal());
 
-        String[] splitTwoSlash = savedLink.getOriginal().split("//");
+        String[] splitTwoSlash = link.getOriginalLink().split("//");
         int indexOfUrl = splitTwoSlash[1].indexOf("/");
         String siteName = splitTwoSlash[1].substring(0, indexOfUrl);
 
         String[] splitSiteName = siteName.split("\\.");
-        StringBuilder result = new StringBuilder("/" + savedLink.getId() + "/");
+        StringBuilder result = new StringBuilder("/" + link.getId() + "/");
 
         if (splitSiteName.length < 3) {
             result.append(splitSiteName[0]);
@@ -37,73 +37,78 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
             result.append(splitSiteName[1]);
         }
 
-        ShortLink shortLink = createShortLink(String.valueOf(result), savedLink.getId());
-        linkCrudService.save(shortLink);
+        ShortLink shortLink = createShortLink(result);
+
+        linkCrudService.updateShortLink(link, shortLink.getLink());
 
         log.info("generate {}", shortLink);
         return shortLink;
     }
 
     @Override
-    public OriginalLink redirect(String link) {
-        ShortLink shortLink = linkCrudService.findFirstByLinkOrderByIdDesc(link);
-        linkCrudService.updateCount(shortLink);
-        OriginalLink originalLink = linkCrudService.findById(shortLink.getOriginalId());
+    public OriginalLink redirect(String shortLink) {
+        Link link = linkCrudService.findFirstByShortLinkOrderByIdDesc(shortLink);
+        linkCrudService.updateCount(link);
+
+        OriginalLink originalLink = new OriginalLink();
+        originalLink.setOriginal(link.getOriginalLink());
+
         log.info("redirect {}", originalLink);
         return originalLink;
     }
 
     @Override
-    public LinkStatistic stats(String link) {
-        ShortLink shortLink = linkCrudService.findFirstByLinkOrderByIdDesc(link);
-        OriginalLink originalLink = linkCrudService.findById(shortLink.getOriginalId());
+    public LinkStatistic stat(String shortLink) {
+        Link link = linkCrudService.findFirstByShortLinkOrderByIdDesc(shortLink);
+        List<Link> links = linkCrudService.findAllSortedByCountDesc();
 
-        List<ShortLink> shortLinks = linkCrudService.findAllSortedByCountDesc();
-
-        long rank = 0;
-        for (int i = 0; i < shortLinks.size(); i++) {
-            if (shortLink.equals(shortLinks.get(i))) {
-                rank = i + 1L;
+        int rank = 0;
+        for (int i = 0; i < links.size(); i++) {
+            if (link.equals(links.get(i))) {
+                rank = i + 1;
             }
         }
 
-        LinkStatistic linkStatistic = createLinkStatistic(shortLink, originalLink, rank);
+        linkCrudService.updateRank(link, rank);
 
-        log.info("stats {}", linkStatistic);
+        LinkStatistic linkStatistic = createLinkStatistic(link, rank);
+
+        log.info("stat {}", linkStatistic);
         return linkStatistic;
     }
 
     @Override
-    public List<LinkStatistic> stats(int page, int count) {
+    public List<LinkStatistic> stats(Integer page, Integer count) {
         List<LinkStatistic> linkStatistics = new ArrayList<>();
-        List<ShortLink> shortLinks = linkCrudService.findAllSortedByCountDesc();
-        AtomicLong rank = new AtomicLong();
-        shortLinks.forEach(shortLink -> {
-            LinkStatistic linkStatistic = createLinkStatistic(shortLink,
-                    linkCrudService.findById(shortLink.getOriginalId()), rank.getAndIncrement() + 1L);
-            linkStatistics.add(linkStatistic);
-        });
+        List<Link> links = linkCrudService.findAllSortedByCountDesc();
 
+        int rank = 0;
+        for (Link link : links) {
+            LinkStatistic linkStatistic = createLinkStatistic(link, rank + 1);
+            linkStatistics.add(linkStatistic);
+            linkCrudService.updateRank(link, rank + 1);
+            rank++;
+        }
+
+        log.info("stats {}", linkStatistics);
         return linkStatistics.stream()
                 .skip((page * 100L) - 100)
                 .limit(count)
                 .toList();
     }
 
-    private static ShortLink createShortLink(String result, Long id) {
-        return ShortLink.builder()
-                .link(result)
-                .originalId(id)
-                .count(0L)
+    private static LinkStatistic createLinkStatistic(Link link, int rank) {
+        return LinkStatistic.builder()
+                .link(link.getShortLink())
+                .original(link.getOriginalLink())
+                .rank(rank)
+                .count(link.getCount())
                 .build();
     }
 
-    private static LinkStatistic createLinkStatistic(ShortLink shortLink, OriginalLink originalLink, long rank) {
-        return LinkStatistic.builder()
-                .link(shortLink.getLink())
-                .original(originalLink.getOriginal())
-                .rank(rank)
-                .count(shortLink.getCount())
+    private static ShortLink createShortLink(StringBuilder result) {
+        return ShortLink.builder()
+                .link(result.toString())
                 .build();
     }
 

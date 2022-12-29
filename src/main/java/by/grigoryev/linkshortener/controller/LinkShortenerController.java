@@ -1,10 +1,11 @@
 package by.grigoryev.linkshortener.controller;
 
 import by.grigoryev.linkshortener.dto.LinkStatistic;
-import by.grigoryev.linkshortener.model.OriginalLink;
-import by.grigoryev.linkshortener.model.ShortLink;
+import by.grigoryev.linkshortener.dto.OriginalLink;
+import by.grigoryev.linkshortener.dto.ShortLink;
 import by.grigoryev.linkshortener.service.LinkShortenerService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class LinkShortenerController {
@@ -31,12 +33,12 @@ public class LinkShortenerController {
     }
 
     @GetMapping("/stat")
-    public ResponseEntity<LinkStatistic> stats(@RequestParam String shortLink) {
-        return ResponseEntity.ok(linkShortenerService.stats(shortLink));
+    public ResponseEntity<LinkStatistic> stat(@RequestParam String shortLink) {
+        return ResponseEntity.ok(linkShortenerService.stat(shortLink));
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<List<LinkStatistic>> stats(@RequestParam int page, int count) {
+    public ResponseEntity<List<LinkStatistic>> stats(@RequestParam Integer page, Integer count) {
         return ResponseEntity.ok(linkShortenerService.stats(page, count));
     }
 

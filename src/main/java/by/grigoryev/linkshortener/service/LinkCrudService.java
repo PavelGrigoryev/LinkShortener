@@ -1,22 +1,21 @@
 package by.grigoryev.linkshortener.service;
 
-import by.grigoryev.linkshortener.model.OriginalLink;
-import by.grigoryev.linkshortener.model.ShortLink;
+import by.grigoryev.linkshortener.model.Link;
 
 import java.util.List;
 
 public interface LinkCrudService {
 
-    OriginalLink save(OriginalLink originalLink);
+    Link save(String originalLink);
 
-    void save(ShortLink shortLink);
+    Link updateShortLink(Link link, String shortLink);
 
-    void updateCount(ShortLink link);
+    Link findFirstByShortLinkOrderByIdDesc(String shortLink);
 
-    ShortLink findFirstByLinkOrderByIdDesc(String link);
+    Link updateCount(Link link);
 
-    OriginalLink findById(Long originalId);
+    List<Link> findAllSortedByCountDesc();
 
-    List<ShortLink> findAllSortedByCountDesc();
+    Link updateRank(Link link, Integer rank);
 
 }
