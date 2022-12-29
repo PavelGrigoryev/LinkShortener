@@ -16,6 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LinkCrudServiceImpl implements LinkCrudService {
 
+    private static final int NUMBER_OF_REDIRECTS_AND_RATING_WHEN_CREATING_A_LINK = 0;
+
     private final LinkRepository linkRepository;
 
     @Override
@@ -70,8 +72,8 @@ public class LinkCrudServiceImpl implements LinkCrudService {
     private Link createLink(String originalLink) {
         return linkRepository.save(Link.builder()
                 .originalLink(originalLink)
-                .count(0)
-                .rank(0)
+                .count(NUMBER_OF_REDIRECTS_AND_RATING_WHEN_CREATING_A_LINK)
+                .rank(NUMBER_OF_REDIRECTS_AND_RATING_WHEN_CREATING_A_LINK)
                 .build());
     }
 

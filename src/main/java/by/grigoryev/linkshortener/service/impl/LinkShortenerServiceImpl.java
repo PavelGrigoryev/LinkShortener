@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Service
@@ -53,6 +54,8 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
         OriginalLink originalLink = new OriginalLink();
         originalLink.setOriginal(link.getOriginalLink());
 
+        createRank();
+
         log.info("redirect {}", originalLink);
         return originalLink;
     }
@@ -60,19 +63,7 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
     @Override
     public LinkStatistic stat(String shortLink) {
         Link link = linkCrudService.findFirstByShortLinkOrderByIdDesc(shortLink);
-        List<Link> links = linkCrudService.findAllSortedByCountDesc();
-
-        int rank = 0;
-        for (int i = 0; i < links.size(); i++) {
-            if (link.equals(links.get(i))) {
-                rank = i + 1;
-            }
-        }
-
-        linkCrudService.updateRank(link, rank);
-
-        LinkStatistic linkStatistic = createLinkStatistic(link, rank);
-
+        LinkStatistic linkStatistic = createLinkStatistic(link);
         log.info("stat {}", linkStatistic);
         return linkStatistic;
     }
@@ -80,15 +71,11 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
     @Override
     public List<LinkStatistic> stats(Integer page, Integer count) {
         List<LinkStatistic> linkStatistics = new ArrayList<>();
-        List<Link> links = linkCrudService.findAllSortedByCountDesc();
-
-        int rank = 0;
-        for (Link link : links) {
-            LinkStatistic linkStatistic = createLinkStatistic(link, rank + 1);
-            linkStatistics.add(linkStatistic);
-            linkCrudService.updateRank(link, rank + 1);
-            rank++;
-        }
+        linkCrudService.findAllSortedByCountDesc()
+                .forEach(link -> {
+                    LinkStatistic linkStatistic = createLinkStatistic(link);
+                    linkStatistics.add(linkStatistic);
+                });
 
         log.info("stats {}", linkStatistics);
         return linkStatistics.stream()
@@ -97,11 +84,20 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
                 .toList();
     }
 
-    private static LinkStatistic createLinkStatistic(Link link, int rank) {
+    private void createRank() {
+        AtomicInteger rank = new AtomicInteger(1);
+        linkCrudService.findAllSortedByCountDesc()
+                .forEach(sortedLink -> {
+                    linkCrudService.updateRank(sortedLink, rank.get());
+                    rank.getAndIncrement();
+                });
+    }
+
+    private static LinkStatistic createLinkStatistic(Link link) {
         return LinkStatistic.builder()
                 .link(link.getShortLink())
                 .original(link.getOriginalLink())
-                .rank(rank)
+                .rank(link.getRank())
                 .count(link.getCount())
                 .build();
     }
