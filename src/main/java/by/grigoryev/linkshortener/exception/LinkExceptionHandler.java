@@ -14,7 +14,16 @@ public class LinkExceptionHandler {
 
     @ExceptionHandler(LinkDoesNotExistException.class)
     public ResponseEntity<IncorrectData> linkDoesNotExistException(LinkDoesNotExistException exception) {
-        data.setInfo(exception.getMessage());
+        return createInfoOfIncorrectData(exception.getMessage());
+    }
+
+    @ExceptionHandler(PageFormatException.class)
+    public ResponseEntity<IncorrectData> pageFormatException(PageFormatException exception) {
+        return createInfoOfIncorrectData(exception.getMessage());
+    }
+
+    private ResponseEntity<IncorrectData> createInfoOfIncorrectData(String exception) {
+        data.setInfo(exception);
         log.error(data.getInfo());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(data);
     }

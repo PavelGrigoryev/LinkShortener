@@ -3,6 +3,7 @@ package by.grigoryev.linkshortener.service.impl;
 import by.grigoryev.linkshortener.dto.LinkStatistic;
 import by.grigoryev.linkshortener.dto.OriginalLink;
 import by.grigoryev.linkshortener.dto.ShortLink;
+import by.grigoryev.linkshortener.exception.PageFormatException;
 import by.grigoryev.linkshortener.mapper.LinkMapper;
 import by.grigoryev.linkshortener.model.Link;
 import by.grigoryev.linkshortener.service.LinkCrudService;
@@ -19,8 +20,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequiredArgsConstructor
 public class LinkShortenerServiceImpl implements LinkShortenerService {
 
-    private final LinkCrudService linkCrudService;
+    private static final int NUMBER_OF_URL_PARTS = 3;
+    private static final int RANK_START_NUMBER = 1;
+    private static final long PAGE_SIZE = 100L;
 
+    private final LinkCrudService linkCrudService;
     private final LinkMapper linkMapper;
 
     @Override
@@ -34,7 +38,7 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
         String[] splitSiteName = siteName.split("\\.");
         StringBuilder result = new StringBuilder("/" + link.getId() + "/");
 
-        if (splitSiteName.length < 3) {
+        if (splitSiteName.length < NUMBER_OF_URL_PARTS) {
             result.append(splitSiteName[0]);
         } else {
             result.append(splitSiteName[1]);
@@ -70,23 +74,36 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
 
     @Override
     public List<LinkStatistic> stats(Integer page, Integer count) {
-        List<Link> links = linkCrudService.findAllSortedByCountDesc();
+        checkPageFormat(page, count);
+
+        List<Link> links = linkCrudService.findAllSortedByCountDesc()
+                .stream()
+                .skip((page * PAGE_SIZE) - PAGE_SIZE)
+                .limit(count)
+                .toList();
         List<LinkStatistic> linkStatistics = linkMapper.toLinkStatisticList(links);
 
         log.info("stats {}", linkStatistics);
-        return linkStatistics.stream()
-                .skip((page * 100L) - 100)
-                .limit(count)
-                .toList();
+        return linkStatistics;
     }
 
     private void createRank() {
-        AtomicInteger rank = new AtomicInteger(1);
+        AtomicInteger rank = new AtomicInteger(RANK_START_NUMBER);
         linkCrudService.findAllSortedByCountDesc()
                 .forEach(sortedLink -> {
                     linkCrudService.updateRank(sortedLink, rank.get());
                     rank.getAndIncrement();
                 });
+    }
+
+    private static void checkPageFormat(Integer page, Integer count) {
+        if (page <= 0) {
+            throw new PageFormatException("Your page number is " + page
+                                          + "! Value must be greater than zero!");
+        } else if (count > PAGE_SIZE || count <= 0) {
+            throw new PageFormatException("Your page size is " + count
+                                          + "! Value must be between 1 and " + PAGE_SIZE + "(inclusive)!");
+        }
     }
 
 }

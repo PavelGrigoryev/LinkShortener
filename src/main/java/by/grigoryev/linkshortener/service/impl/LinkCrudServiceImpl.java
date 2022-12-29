@@ -17,6 +17,7 @@ import java.util.List;
 public class LinkCrudServiceImpl implements LinkCrudService {
 
     private static final int NUMBER_OF_REDIRECTS_AND_RATING_WHEN_CREATING_A_LINK = 0;
+    private static final int REDIRECT_LINK_INCREMENT = 1;
 
     private final LinkRepository linkRepository;
 
@@ -46,7 +47,7 @@ public class LinkCrudServiceImpl implements LinkCrudService {
 
     @Override
     public Link updateCount(Link link) {
-        link.setCount(link.getCount() + 1);
+        link.setCount(link.getCount() + REDIRECT_LINK_INCREMENT);
         Link updatedLink = linkRepository.save(link);
         log.info("updateCount {}", updatedLink);
         return updatedLink;

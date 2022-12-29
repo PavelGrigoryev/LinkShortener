@@ -23,13 +23,13 @@ Content-Type: application/json
 }
 
 ###redirect
-GET http://localhost:8080/?shortLink=/3/habr
+GET http://localhost:8080/?shortLink=/91/noob-club
 Accept: application/json
 
 ###stat
-GET http://localhost:8080/stat/?shortLink=/3/habr
+GET http://localhost:8080/stat/?shortLink=/91/noob-club
 Accept: application/json
 
 ###stats
-GET http://localhost:8080/stats/?page=1&count=5
+GET http://localhost:8080/stats/?page=2&count=58
 Accept: application/json
