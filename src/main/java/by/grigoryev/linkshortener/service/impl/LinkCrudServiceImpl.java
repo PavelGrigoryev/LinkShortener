@@ -23,6 +23,7 @@ public class LinkCrudServiceImpl implements LinkCrudService {
     @Override
     public Link save(String originalLink) {
         Link link = createLink(originalLink);
+        linkRepository.save(link);
         log.info("save {}", link);
         return link;
     }
@@ -70,11 +71,11 @@ public class LinkCrudServiceImpl implements LinkCrudService {
     }
 
     private Link createLink(String originalLink) {
-        return linkRepository.save(Link.builder()
+        return Link.builder()
                 .originalLink(originalLink)
                 .count(NUMBER_OF_REDIRECTS_AND_RATING_WHEN_CREATING_A_LINK)
                 .rank(NUMBER_OF_REDIRECTS_AND_RATING_WHEN_CREATING_A_LINK)
-                .build());
+                .build();
     }
 
 }

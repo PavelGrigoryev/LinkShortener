@@ -3,6 +3,7 @@ package by.grigoryev.linkshortener.service.impl;
 import by.grigoryev.linkshortener.dto.LinkStatistic;
 import by.grigoryev.linkshortener.dto.OriginalLink;
 import by.grigoryev.linkshortener.dto.ShortLink;
+import by.grigoryev.linkshortener.mapper.LinkMapper;
 import by.grigoryev.linkshortener.model.Link;
 import by.grigoryev.linkshortener.service.LinkCrudService;
 import by.grigoryev.linkshortener.service.LinkShortenerService;
@@ -10,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -20,6 +20,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class LinkShortenerServiceImpl implements LinkShortenerService {
 
     private final LinkCrudService linkCrudService;
+
+    private final LinkMapper linkMapper;
 
     @Override
     public ShortLink generate(OriginalLink originalLink) {
@@ -38,9 +40,8 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
             result.append(splitSiteName[1]);
         }
 
-        ShortLink shortLink = createShortLink(result);
-
-        linkCrudService.updateShortLink(link, shortLink.getLink());
+        Link updatedLink = linkCrudService.updateShortLink(link, result.toString());
+        ShortLink shortLink = linkMapper.toShortLink(updatedLink);
 
         log.info("generate {}", shortLink);
         return shortLink;
@@ -51,8 +52,7 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
         Link link = linkCrudService.findFirstByShortLinkOrderByIdDesc(shortLink);
         linkCrudService.updateCount(link);
 
-        OriginalLink originalLink = new OriginalLink();
-        originalLink.setOriginal(link.getOriginalLink());
+        OriginalLink originalLink = linkMapper.toOriginalLink(link);
 
         createRank();
 
@@ -63,19 +63,15 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
     @Override
     public LinkStatistic stat(String shortLink) {
         Link link = linkCrudService.findFirstByShortLinkOrderByIdDesc(shortLink);
-        LinkStatistic linkStatistic = createLinkStatistic(link);
+        LinkStatistic linkStatistic = linkMapper.toLinkStatistic(link);
         log.info("stat {}", linkStatistic);
         return linkStatistic;
     }
 
     @Override
     public List<LinkStatistic> stats(Integer page, Integer count) {
-        List<LinkStatistic> linkStatistics = new ArrayList<>();
-        linkCrudService.findAllSortedByCountDesc()
-                .forEach(link -> {
-                    LinkStatistic linkStatistic = createLinkStatistic(link);
-                    linkStatistics.add(linkStatistic);
-                });
+        List<Link> links = linkCrudService.findAllSortedByCountDesc();
+        List<LinkStatistic> linkStatistics = linkMapper.toLinkStatisticList(links);
 
         log.info("stats {}", linkStatistics);
         return linkStatistics.stream()
@@ -91,21 +87,6 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
                     linkCrudService.updateRank(sortedLink, rank.get());
                     rank.getAndIncrement();
                 });
-    }
-
-    private static LinkStatistic createLinkStatistic(Link link) {
-        return LinkStatistic.builder()
-                .link(link.getShortLink())
-                .original(link.getOriginalLink())
-                .rank(link.getRank())
-                .count(link.getCount())
-                .build();
-    }
-
-    private static ShortLink createShortLink(StringBuilder result) {
-        return ShortLink.builder()
-                .link(result.toString())
-                .build();
     }
 
 }
