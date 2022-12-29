@@ -51,9 +51,9 @@ public class LinkCrudServiceImpl implements LinkCrudService {
     }
 
     @Override
-    public OriginalLink findById(ShortLink shortLink) {
-        OriginalLink originalLink = originalLinkRepository.findById(shortLink.getOriginalId())
-                .orElseThrow(() -> new LinkDoesNotExistException("Original link with id " + shortLink.getOriginalId() +
+    public OriginalLink findById(Long originalId) {
+        OriginalLink originalLink = originalLinkRepository.findById(originalId)
+                .orElseThrow(() -> new LinkDoesNotExistException("Original link with id " + originalId +
                                                                  " does not exist!"));
         log.info("findById {}", originalLink);
         return originalLink;

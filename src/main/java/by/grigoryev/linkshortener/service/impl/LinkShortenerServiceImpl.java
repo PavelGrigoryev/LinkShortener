@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Service
@@ -46,7 +48,7 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
     public OriginalLink redirect(String link) {
         ShortLink shortLink = linkCrudService.findFirstByLinkOrderByIdDesc(link);
         linkCrudService.updateCount(shortLink);
-        OriginalLink originalLink = linkCrudService.findById(shortLink);
+        OriginalLink originalLink = linkCrudService.findById(shortLink.getOriginalId());
         log.info("redirect {}", originalLink);
         return originalLink;
     }
@@ -54,7 +56,7 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
     @Override
     public LinkStatistic stats(String link) {
         ShortLink shortLink = linkCrudService.findFirstByLinkOrderByIdDesc(link);
-        OriginalLink originalLink = linkCrudService.findById(shortLink);
+        OriginalLink originalLink = linkCrudService.findById(shortLink.getOriginalId());
 
         List<ShortLink> shortLinks = linkCrudService.findAllSortedByCountDesc();
 
@@ -69,6 +71,23 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
 
         log.info("stats {}", linkStatistic);
         return linkStatistic;
+    }
+
+    @Override
+    public List<LinkStatistic> stats(int page, int count) {
+        List<LinkStatistic> linkStatistics = new ArrayList<>();
+        List<ShortLink> shortLinks = linkCrudService.findAllSortedByCountDesc();
+        AtomicLong rank = new AtomicLong();
+        shortLinks.forEach(shortLink -> {
+            LinkStatistic linkStatistic = createLinkStatistic(shortLink,
+                    linkCrudService.findById(shortLink.getOriginalId()), rank.getAndIncrement() + 1L);
+            linkStatistics.add(linkStatistic);
+        });
+
+        return linkStatistics.stream()
+                .skip((page * 100L) - 100)
+                .limit(count)
+                .toList();
     }
 
     private static ShortLink createShortLink(String result, Long id) {

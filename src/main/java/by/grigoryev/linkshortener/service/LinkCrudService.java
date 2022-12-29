@@ -15,7 +15,7 @@ public interface LinkCrudService {
 
     ShortLink findFirstByLinkOrderByIdDesc(String link);
 
-    OriginalLink findById(ShortLink shortLink);
+    OriginalLink findById(Long originalId);
 
     List<ShortLink> findAllSortedByCountDesc();
 

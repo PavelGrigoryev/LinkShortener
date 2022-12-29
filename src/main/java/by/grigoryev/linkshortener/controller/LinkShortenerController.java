@@ -10,10 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class LinkController {
+public class LinkShortenerController {
 
     private final LinkShortenerService linkShortenerService;
 
@@ -29,9 +30,14 @@ public class LinkController {
                 .build();
     }
 
-    @GetMapping("/stats")
+    @GetMapping("/stat")
     public ResponseEntity<LinkStatistic> stats(@RequestParam String shortLink) {
         return ResponseEntity.ok(linkShortenerService.stats(shortLink));
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<List<LinkStatistic>> stats(@RequestParam int page, int count) {
+        return ResponseEntity.ok(linkShortenerService.stats(page, count));
     }
 
 }
