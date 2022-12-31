@@ -10,6 +10,7 @@ import by.grigoryev.linkshortener.service.LinkCrudService;
 import by.grigoryev.linkshortener.service.LinkShortenerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
     private static final long PAGE_SIZE = 100L;
 
     private final LinkCrudService linkCrudService;
-    private final LinkMapper linkMapper;
+    private final LinkMapper linkMapper = Mappers.getMapper(LinkMapper.class);
 
     @Override
     public ShortLink generate(OriginalLink originalLink) {

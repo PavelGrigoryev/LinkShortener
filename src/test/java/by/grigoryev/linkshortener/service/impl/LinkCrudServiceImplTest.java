@@ -21,7 +21,6 @@ class LinkCrudServiceImplTest {
     private static final String SHORT_LINK = "/1/noob-club";
     private static final Integer RANK_AND_COUNT = 0;
 
-
     private LinkCrudService linkCrudService;
     private LinkRepository linkRepository;
 
@@ -67,6 +66,7 @@ class LinkCrudServiceImplTest {
         Exception exception = assertThrows(LinkDoesNotExistException.class,
                 () -> linkCrudService.findFirstByShortLinkOrderByIdDesc(SHORT_LINK));
         String expectedMessage = "This link " + SHORT_LINK + " does not exist!";
+
         assertEquals(expectedMessage, exception.getMessage());
     }
 
