@@ -1,6 +1,27 @@
+###register
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+  "firstname": "Pavel",
+  "lastname": "Shishkin",
+  "email": "Green@mail.com",
+  "password": "1234"
+}
+
+###authenticate
+POST http://localhost:8080/auth/authenticate
+Content-Type: application/json
+
+{
+  "email": "Green@mail.com",
+  "password": "1234"
+}
+
 ###generate #1
 POST http://localhost:8080/generate
 Content-Type: application/json
+Authorization: Bearer {{auth_token}}
 
 {
   "original": "https://www.noob-club.ru/index.php?frontpage;p=45"
@@ -9,6 +30,7 @@ Content-Type: application/json
 ###generate #2
 POST http://localhost:8080/generate
 Content-Type: application/json
+Authorization: Bearer {{auth_token}}
 
 {
   "original": "https://catalog.onliner.by/notebook?page=2"
@@ -17,6 +39,7 @@ Content-Type: application/json
 ###generate #3
 POST http://localhost:8080/generate
 Content-Type: application/json
+Authorization: Bearer {{auth_token}}
 
 {
   "original": "https://habr.com/ru/news/t/708070/"
@@ -25,11 +48,14 @@ Content-Type: application/json
 ###redirect
 GET http://localhost:8080/?shortLink=/2/onliner
 Accept: application/json
+Authorization: Bearer {{auth_token}}
 
 ###stat
 GET http://localhost:8080/stat/?shortLink=/2/onliner
 Accept: application/json
+Authorization: Bearer {{auth_token}}
 
 ###stats
 GET http://localhost:8080/stats/?page=1&count=5
 Accept: application/json
+Authorization: Bearer {{auth_token}}

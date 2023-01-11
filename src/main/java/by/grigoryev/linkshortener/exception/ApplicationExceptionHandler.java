@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @Slf4j
 @ControllerAdvice
-public class LinkExceptionHandler {
+public class ApplicationExceptionHandler {
 
     private final IncorrectData data = new IncorrectData();
 
@@ -19,6 +19,11 @@ public class LinkExceptionHandler {
 
     @ExceptionHandler(PageFormatException.class)
     public ResponseEntity<IncorrectData> pageFormatException(PageFormatException exception) {
+        return createInfoOfIncorrectData(exception.getMessage());
+    }
+
+    @ExceptionHandler(UserEmailNotFoundException.class)
+    public ResponseEntity<IncorrectData> userEmailNotFoundException(UserEmailNotFoundException exception) {
         return createInfoOfIncorrectData(exception.getMessage());
     }
 
