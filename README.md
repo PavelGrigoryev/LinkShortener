@@ -12,7 +12,10 @@ There are also statistics of the most popular short links.
 * Spring-boot 2.7.7
 * Spring-boot-starter-data-jpa
 * Spring-boot-starter-web (Apache Tomcat)
+* Spring-boot-starter-security
+* JWT(Json Web Token)
 * Spring-boot-starter-test
+* Spring-security-test
 * Lombok
 * Mapstruct
 * H2 (in memory)
@@ -46,10 +49,57 @@ The unit tests will also be run every time the Docker image is rebuilt
 ## Functionalities
 
 In summary the application can:
+***
+***1. AuthenticationController [auth.http](src/main/resources/auth.http)***
+***
 
-***LinkShortenerController [links.http](src/main/resources/links.http)***
+* **POST register**
+    * Registers a user and issues jwt that valid during 24 hours
+    * http://localhost:8080/auth/register
+    * Request body example:
+  ````
+      {
+      "firstname": "Pavel",
+      "lastname": "Shishkin",
+      "email": "Georgiy@mail.com",
+      "password": "1234"
+      }
+  ````
+    * Response example:
+  ````
+      {
+      "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJHZW9yZ2l5QG1haWwuY29tIiwiaWF0IjoxNjczNTMxNjg1LCJleHAiOjE2NzM2MTgwODV9.USdnXwFkSRh6f1NT7HbWIKausZE0Jt-QEzaWkWtfCK4",
+      "tokenExpiration": "Fri Jan 13 16:54:45 MSK 2023"
+      }
+  ````
 
-* **POST**
+* **POST authenticate**
+    * You can get a new token if the previous one has expired entering your email and password
+    * http://localhost:8080/auth/authenticate
+    * Request body example:
+  ````
+     {
+     "email": "Georgiy@mail.com",
+     "password": "1234"
+     }
+  ````
+    * Response example:
+  ````
+      {
+      "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJHZW9yZ2l5QG1haWwuY29tIiwiaWF0IjoxNjczNTMxNjg5LCJleHAiOjE2NzM2MTgwODl9.odSokMxjlMDV8ykkP06vTcdgNZU95DIyPwah1KDi6hI",
+      "tokenExpiration": "Fri Jan 13 16:54:49 MSK 2023"
+      }
+  ````
+
+***
+***2. LinkShortenerController [links.http](src/main/resources/links.http)***
+
+In [http-client.private.env.json](src/main/resources/http-client.private.env.json) line №3 you must insert your
+jwt token issued to you during registration or authentication
+
+***
+
+* **POST generate**
     * Cuts the original link to a short one
     * http://localhost:8080/generate
     * Request body example:
@@ -64,10 +114,10 @@ In summary the application can:
       "link": "/1/noob-club"
       }
   ````
-* **GET**
+* **GET redirect**
     * Redirects via a short link to the original
     * http://localhost:8080/?shortLink=/1/noob-club
-* **GET**
+* **GET stat**
     * Processes the GET request and returns statistics of clicks on a specific link
     * http://localhost:8080/stat/?shortLink=/1/noob-club
     * Response example:
@@ -79,7 +129,7 @@ In summary the application can:
       "count": 0
       }
   ````
-* **GET**
+* **GET stats**
     * Processes the GET request and returns statistics of requests from sorting by frequency of requests in descending
       order and the possibility of paging display
     * page - page number
