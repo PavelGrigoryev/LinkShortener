@@ -11,6 +11,7 @@ import by.grigoryev.linkshortener.security.JwtService;
 import by.grigoryev.linkshortener.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,8 +33,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public AuthenticationResponse register(RegisterRequest request) {
         User user = createUser(request);
-        User savedUser = userRepository.save(user);
-        return createAuthenticationResponse(savedUser);
+        try {
+            User savedUser = userRepository.save(user);
+            return createAuthenticationResponse(savedUser);
+        } catch (DataIntegrityViolationException e) {
+            log.error(e.getMessage());
+            return AuthenticationResponse.builder()
+                    .token("Email is occupied")
+                    .tokenExpiration("Another user is already registered to this email!")
+                    .build();
+        }
     }
 
     @Override
