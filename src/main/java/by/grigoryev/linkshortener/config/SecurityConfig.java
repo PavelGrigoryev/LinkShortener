@@ -30,7 +30,7 @@ public class SecurityConfig {
         return httpSecurity.csrf()
                 .disable()
                 .authorizeHttpRequests()
-                .antMatchers("/auth/**")
+                .antMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

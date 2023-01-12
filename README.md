@@ -19,6 +19,7 @@ There are also statistics of the most popular short links.
 * Lombok
 * Mapstruct
 * H2 (in memory)
+* Swagger
 * Docker
 
 ### Instructions to run application locally:
@@ -45,6 +46,13 @@ mvn test
 ```
 
 The unit tests will also be run every time the Docker image is rebuilt
+
+## Documentation
+
+To view the API Swagger documentation, start the application and see:
+
+* [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
+* [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
 
 ## Functionalities
 
