@@ -3,6 +3,7 @@ package by.grigoryev.linkshortener.controller;
 import by.grigoryev.linkshortener.dto.LinkStatistic;
 import by.grigoryev.linkshortener.dto.OriginalLink;
 import by.grigoryev.linkshortener.dto.ShortLink;
+import by.grigoryev.linkshortener.security.JwtService;
 import by.grigoryev.linkshortener.service.LinkShortenerService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -19,10 +21,12 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@WithMockUser
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(LinkShortenerController.class)
 class LinkShortenerControllerTest {
@@ -50,6 +54,8 @@ class LinkShortenerControllerTest {
     private MockMvc mockMvc;
     @MockBean
     private LinkShortenerService linkShortenerService;
+    @MockBean
+    private JwtService jwtService;
 
     @Test
     @DisplayName("testing generate endpoint")
@@ -62,6 +68,7 @@ class LinkShortenerControllerTest {
                 .generate(any(OriginalLink.class));
 
         mockMvc.perform(post("/generate")
+                        .with(csrf())
                         .content(JSON_LINK_CONTENT)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated())

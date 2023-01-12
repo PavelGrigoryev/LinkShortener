@@ -31,20 +31,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationResponse register(RegisterRequest request) {
-        User user = User.builder()
-                .firstname(request.getFirstname())
-                .lastname(request.getLastname())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
-                .build();
+        User user = createUser(request);
         User savedUser = userRepository.save(user);
-        String jwtToken = jwtService.generateToken(user);
-        log.info("register " + savedUser);
-        log.info("register with token " + jwtToken);
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .build();
+        return createAuthenticationResponse(savedUser);
     }
 
     @Override
@@ -53,11 +42,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UserEmailNotFoundException("User with email " + request.getEmail() + " not found"));
+        return createAuthenticationResponse(user);
+    }
+
+    private AuthenticationResponse createAuthenticationResponse(User user) {
         String jwtToken = jwtService.generateToken(user);
-        log.info("authenticate " + user);
-        log.info("authenticate with token " + jwtToken);
+        log.info("register " + user);
+        log.info("register with token " + jwtToken);
+        log.info("token will be expired " + jwtService.extractExpiration(jwtToken));
         return AuthenticationResponse.builder()
                 .token(jwtToken)
+                .tokenExpiration(jwtService.extractExpiration(jwtToken).toString())
+                .build();
+    }
+
+    private User createUser(RegisterRequest request) {
+        return User.builder()
+                .firstname(request.getFirstname())
+                .lastname(request.getLastname())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.USER)
                 .build();
     }
 
