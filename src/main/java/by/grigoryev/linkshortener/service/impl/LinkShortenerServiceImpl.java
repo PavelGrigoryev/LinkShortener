@@ -1,8 +1,8 @@
 package by.grigoryev.linkshortener.service.impl;
 
-import by.grigoryev.linkshortener.dto.LinkStatistic;
-import by.grigoryev.linkshortener.dto.OriginalLink;
-import by.grigoryev.linkshortener.dto.ShortLink;
+import by.grigoryev.linkshortener.dto.link.LinkStatistic;
+import by.grigoryev.linkshortener.dto.link.OriginalLink;
+import by.grigoryev.linkshortener.dto.link.ShortLink;
 import by.grigoryev.linkshortener.exception.PageFormatException;
 import by.grigoryev.linkshortener.mapper.LinkMapper;
 import by.grigoryev.linkshortener.model.Link;

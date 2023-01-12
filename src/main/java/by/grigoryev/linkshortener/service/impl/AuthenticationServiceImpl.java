@@ -1,8 +1,8 @@
 package by.grigoryev.linkshortener.service.impl;
 
-import by.grigoryev.linkshortener.dto.AuthenticationRequest;
-import by.grigoryev.linkshortener.dto.AuthenticationResponse;
-import by.grigoryev.linkshortener.dto.RegisterRequest;
+import by.grigoryev.linkshortener.dto.auth.AuthenticationRequest;
+import by.grigoryev.linkshortener.dto.auth.AuthenticationResponse;
+import by.grigoryev.linkshortener.dto.auth.RegisterRequest;
 import by.grigoryev.linkshortener.exception.UserEmailNotFoundException;
 import by.grigoryev.linkshortener.model.Role;
 import by.grigoryev.linkshortener.model.User;

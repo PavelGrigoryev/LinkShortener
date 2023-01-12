@@ -1,8 +1,8 @@
 package by.grigoryev.linkshortener.service;
 
-import by.grigoryev.linkshortener.dto.AuthenticationRequest;
-import by.grigoryev.linkshortener.dto.AuthenticationResponse;
-import by.grigoryev.linkshortener.dto.RegisterRequest;
+import by.grigoryev.linkshortener.dto.auth.AuthenticationRequest;
+import by.grigoryev.linkshortener.dto.auth.AuthenticationResponse;
+import by.grigoryev.linkshortener.dto.auth.RegisterRequest;
 
 public interface AuthenticationService {
 

@@ -1,8 +1,8 @@
 package by.grigoryev.linkshortener.controller;
 
-import by.grigoryev.linkshortener.dto.LinkStatistic;
-import by.grigoryev.linkshortener.dto.OriginalLink;
-import by.grigoryev.linkshortener.dto.ShortLink;
+import by.grigoryev.linkshortener.dto.link.LinkStatistic;
+import by.grigoryev.linkshortener.dto.link.OriginalLink;
+import by.grigoryev.linkshortener.dto.link.ShortLink;
 import by.grigoryev.linkshortener.service.LinkShortenerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

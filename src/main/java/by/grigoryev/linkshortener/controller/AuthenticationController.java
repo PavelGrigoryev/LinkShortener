@@ -1,8 +1,8 @@
 package by.grigoryev.linkshortener.controller;
 
-import by.grigoryev.linkshortener.dto.AuthenticationRequest;
-import by.grigoryev.linkshortener.dto.AuthenticationResponse;
-import by.grigoryev.linkshortener.dto.RegisterRequest;
+import by.grigoryev.linkshortener.dto.auth.AuthenticationRequest;
+import by.grigoryev.linkshortener.dto.auth.AuthenticationResponse;
+import by.grigoryev.linkshortener.dto.auth.RegisterRequest;
 import by.grigoryev.linkshortener.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

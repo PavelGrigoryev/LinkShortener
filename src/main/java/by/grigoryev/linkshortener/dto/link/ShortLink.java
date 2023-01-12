@@ -1,4 +1,4 @@
-package by.grigoryev.linkshortener.dto;
+package by.grigoryev.linkshortener.dto.link;
 
 import lombok.Data;
 
