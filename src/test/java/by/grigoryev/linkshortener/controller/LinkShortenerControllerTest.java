@@ -78,15 +78,8 @@ class LinkShortenerControllerTest {
     @Test
     @DisplayName("testing generate endpoint throws 403")
     void generateThrows403() throws Exception {
-        ShortLink mockedShortLink = new ShortLink();
-        mockedShortLink.setLink(SHORT_LINK);
-
-        doReturn(mockedShortLink)
-                .when(linkShortenerService)
-                .generate(any(OriginalLink.class));
-
         mockMvc.perform(post("/generate")
-                        .content(JSON_LINK_CONTENT)
+                        .with(csrf().useInvalidToken())
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
