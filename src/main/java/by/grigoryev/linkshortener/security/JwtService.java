@@ -18,6 +18,11 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
+    /**
+     * 1000 milliseconds * 60 seconds * 60 minutes * 24 hours = 24 hours
+     */
+    public static final int JWT_TOKEN_VALIDITY = 1000 * 60 * 60 * 24;
+
     @Value("${secret.key}")
     private String secretKey;
 
@@ -39,7 +44,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
