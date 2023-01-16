@@ -28,15 +28,15 @@ public class AuthenticationController {
             summary = "Register", tags = "Authentication",
             requestBody = @io.swagger.v3.oas.annotations.parameters
                     .RequestBody(description = "RequestBody for register",
-                    content = @Content(schema = @Schema(implementation = RegisterRequest.class)
-                            , examples = @ExampleObject("""
-                            {
-                              "firstname": "Pavel",
-                              "lastname": "Shishkin",
-                              "email": "Georgiy@mail.com",
-                              "password": "1234"
-                            }
-                            """))
+                    content = @Content(schema = @Schema(implementation = RegisterRequest.class),
+                            examples = @ExampleObject("""
+                                    {
+                                      "firstname": "Pavel",
+                                      "lastname": "Shishkin",
+                                      "email": "Georgiy@mail.com",
+                                      "password": "1234"
+                                    }
+                                    """))
             )
     )
     @PostMapping("/register")
@@ -48,13 +48,13 @@ public class AuthenticationController {
             summary = "Authenticate", tags = "Authentication",
             requestBody = @io.swagger.v3.oas.annotations.parameters
                     .RequestBody(description = "RequestBody for authenticate",
-                    content = @Content(schema = @Schema(implementation = AuthenticationRequest.class)
-                            , examples = @ExampleObject("""
-                            {
-                              "email": "Georgiy@mail.com",
-                              "password": "1234"
-                            }
-                            """))
+                    content = @Content(schema = @Schema(implementation = AuthenticationRequest.class),
+                            examples = @ExampleObject("""
+                                    {
+                                      "email": "Georgiy@mail.com",
+                                      "password": "1234"
+                                    }
+                                    """))
             )
     )
     @PostMapping("/authenticate")

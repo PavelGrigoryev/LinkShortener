@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -37,7 +38,7 @@ public class SecurityConfig {
                 .authenticated()
                 .and()
                 .exceptionHandling()
-                .authenticationEntryPoint((request, response, authException) -> unauthorized(response))
+                .authenticationEntryPoint((request, response, authException) -> unauthorized(response, authException))
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -47,12 +48,12 @@ public class SecurityConfig {
                 .build();
     }
 
-    private static void unauthorized(HttpServletResponse response) throws IOException {
+    private static void unauthorized(HttpServletResponse response, AuthenticationException authException) throws IOException {
         Map<String, Object> responseMap = new LinkedHashMap<>();
         ObjectMapper mapper = new ObjectMapper();
         response.setStatus(401);
         responseMap.put("error", true);
-        responseMap.put("message", "Unauthorized");
+        responseMap.put("message", authException.getMessage());
         response.setHeader("content-type", "application/json");
         String responseMessage = mapper.writeValueAsString(responseMap);
         response.getWriter().write(responseMessage);

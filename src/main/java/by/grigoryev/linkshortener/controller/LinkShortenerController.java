@@ -32,12 +32,12 @@ public class LinkShortenerController {
             description = "Enter your original link and get a short one",
             requestBody = @io.swagger.v3.oas.annotations.parameters
                     .RequestBody(description = "RequestBody for original link",
-                    content = @Content(schema = @Schema(implementation = OriginalLink.class)
-                            , examples = @ExampleObject("""
-                            {
-                              "original": "https://www.noob-club.ru/index.php?frontpage;p=45"
-                            }
-                            """))
+                    content = @Content(schema = @Schema(implementation = OriginalLink.class),
+                            examples = @ExampleObject("""
+                                    {
+                                      "original": "https://www.noob-club.ru/index.php?frontpage;p=45"
+                                    }
+                                    """))
             )
     )
     @PostMapping("/generate")
