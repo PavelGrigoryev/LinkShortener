@@ -60,8 +60,7 @@ class LinkShortenerControllerTest {
     @Test
     @DisplayName("testing generate endpoint")
     void generate() throws Exception {
-        ShortLink mockedShortLink = new ShortLink();
-        mockedShortLink.setLink(SHORT_LINK);
+        ShortLink mockedShortLink = new ShortLink(SHORT_LINK);
 
         doReturn(mockedShortLink)
                 .when(linkShortenerService)
@@ -87,8 +86,7 @@ class LinkShortenerControllerTest {
     @Test
     @DisplayName("testing redirect endpoint")
     void redirect() throws Exception {
-        OriginalLink mockedOriginalLink = new OriginalLink();
-        mockedOriginalLink.setOriginal(ORIGINAL_LINK);
+        OriginalLink mockedOriginalLink = new OriginalLink(ORIGINAL_LINK);
 
         doReturn(mockedOriginalLink)
                 .when(linkShortenerService)
@@ -140,12 +138,12 @@ class LinkShortenerControllerTest {
     }
 
     private static LinkStatistic getMockedLinkStatistic() {
-        LinkStatistic mockedLinkStatistic = new LinkStatistic();
-        mockedLinkStatistic.setLink(SHORT_LINK);
-        mockedLinkStatistic.setOriginal(ORIGINAL_LINK);
-        mockedLinkStatistic.setRank(RANK_AND_COUNT);
-        mockedLinkStatistic.setCount(RANK_AND_COUNT);
-        return mockedLinkStatistic;
+        return new LinkStatistic(
+                SHORT_LINK,
+                ORIGINAL_LINK,
+                RANK_AND_COUNT,
+                RANK_AND_COUNT
+        );
     }
 
 }

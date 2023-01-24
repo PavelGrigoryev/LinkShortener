@@ -1,12 +1,7 @@
 package by.grigoryev.linkshortener.dto.auth;
 
-import lombok.Data;
-
-@Data
-public class AuthenticationRequest {
-
-    private String email;
-
-    private String password;
-
+public record AuthenticationRequest(
+        String email,
+        String password
+) {
 }

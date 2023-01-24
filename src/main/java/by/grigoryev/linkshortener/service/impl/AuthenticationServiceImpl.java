@@ -38,19 +38,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return createAuthenticationResponse(savedUser);
         } catch (DataIntegrityViolationException e) {
             log.error(e.getMessage());
-            return AuthenticationResponse.builder()
-                    .token("Email is occupied")
-                    .tokenExpiration("Another user is already registered to this email!")
-                    .build();
+            return new AuthenticationResponse(
+                    "Email is occupied",
+                    "Another user is already registered to this email!"
+            );
         }
     }
 
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UserEmailNotFoundException("User with email " + request.getEmail() + " not found"));
+                new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new UserEmailNotFoundException("User with email " + request.email() + " not found"));
         return createAuthenticationResponse(user);
     }
 
@@ -59,18 +59,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         log.info("register " + user);
         log.info("register with token " + jwtToken);
         log.info("token will be expired " + jwtService.extractExpiration(jwtToken));
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .tokenExpiration(jwtService.extractExpiration(jwtToken).toString())
-                .build();
+        return new AuthenticationResponse(jwtToken, jwtService.extractExpiration(jwtToken).toString());
     }
 
     private User createUser(RegisterRequest request) {
         return User.builder()
-                .firstname(request.getFirstname())
-                .lastname(request.getLastname())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
+                .firstname(request.firstname())
+                .lastname(request.lastname())
+                .email(request.email())
+                .password(passwordEncoder.encode(request.password()))
                 .role(Role.USER)
                 .build();
     }

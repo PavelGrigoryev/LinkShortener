@@ -53,7 +53,7 @@ public class LinkShortenerController {
     @GetMapping
     public ResponseEntity<Void> redirect(@RequestParam String shortLink) {
         return ResponseEntity.status(HttpStatus.PERMANENT_REDIRECT)
-                .location(URI.create(linkShortenerService.redirect(shortLink).getOriginal()))
+                .location(URI.create(linkShortenerService.redirect(shortLink).original()))
                 .build();
     }
 

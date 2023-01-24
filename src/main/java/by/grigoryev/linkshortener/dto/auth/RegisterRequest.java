@@ -1,16 +1,9 @@
 package by.grigoryev.linkshortener.dto.auth;
 
-import lombok.Data;
-
-@Data
-public class RegisterRequest {
-
-    private String firstname;
-
-    private String lastname;
-
-    private String email;
-
-    private String password;
-
+public record RegisterRequest(
+        String firstname,
+        String lastname,
+        String email,
+        String password
+) {
 }

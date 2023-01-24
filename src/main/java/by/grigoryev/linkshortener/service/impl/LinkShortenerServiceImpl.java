@@ -30,7 +30,7 @@ public class LinkShortenerServiceImpl implements LinkShortenerService {
 
     @Override
     public ShortLink generate(OriginalLink originalLink) {
-        Link link = linkCrudService.save(originalLink.getOriginal());
+        Link link = linkCrudService.save(originalLink.original());
 
         String[] splitTwoSlash = link.getOriginalLink().split("//");
         int indexOfUrl = splitTwoSlash[1].indexOf("/");
